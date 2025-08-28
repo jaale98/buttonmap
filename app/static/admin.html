@@ -1,8 +1,61 @@
 <!doctype html>
 <html>
-  <head><meta charset="utf-8"><title>Admin</title></head>
+  <head>
+    <meta charset="utf-8" />
+    <title>Admin</title>
+  </head>
   <body>
-    <h1>Admin (placeholder)</h1>
-    <!-- Step 9: add 10 inputs + PUT /api/v1/labels -->
+    <h1>Admin Page</h1>
+    <form id="labels-form">
+      <div id="inputs"></div>
+      <button type="submit">Save</button>
+    </form>
+
+    <script>
+      const inputsDiv = document.getElementById("inputs");
+      for (let i = 1; i <= 10; i++) {
+        const label = document.createElement("label");
+        label.textContent = `Slot ${i}: `;
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = `slot-${i}`;
+        label.appendChild(input);
+        inputsDiv.appendChild(label);
+        inputsDiv.appendChild(document.createElement("br"));
+      }
+
+      async function loadLabels() {
+        const res = await fetch("/api/v1/labels");
+        if (res.ok) {
+          const data = await res.json();
+          data.forEach((item) => {
+            const inp = document.querySelector(`[name=slot-${item.slot}]`);
+            if (inp) inp.value = item.text;
+          });
+        }
+      }
+      loadLabels();
+
+      document
+        .getElementById("labels-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const items = [];
+          for (let i = 1; i <= 10; i++) {
+            const val = document.querySelector(`[name=slot-${i}]`).value;
+            items.push({ slot: i, text: val });
+          }
+          const res = await fetch("/api/v1/labels", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ items }),
+          });
+          if (res.ok) {
+            alert("Saved!");
+          } else {
+            alert("Error saving labels.");
+          }
+        });
+    </script>
   </body>
 </html>
