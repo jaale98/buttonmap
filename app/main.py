@@ -7,12 +7,16 @@ from app.core.db import engine, SessionLocal
 from sqlalchemy.exc import OperationalError  
 from app.services.bootstrap import ensure_slots  
 import logging  
+
 app = FastAPI(
     title="ButtonMap API",
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+from app.api.v1 import labels as labels_router
+app.include_router(labels_router.router, prefix="/api/v1")
 
 logger = logging.getLogger("buttonmap")
 if not logger.handlers:
